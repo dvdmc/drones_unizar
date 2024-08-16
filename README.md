@@ -4,7 +4,7 @@ This repository is intended to deploy software into turtlebot's from the RoPeRT 
 
 ## Requirements
 
-This system was tested on Turtlebots' and ground station computers running __TODO!__. The installtion script will take care of ROS installation if it is not installed.
+This system was tested on __TODO!__ and ground station computers running __TODO!__. The installtion script will take care of ROS installation if it is not installed.
 
 ## Install
 

@@ -1,0 +1,110 @@
+<launch>
+
+
+    <arg name="ns" default="/"/> 
+    <arg name="drone_name" default="target"/>  
+
+    <arg name="use_optitrack" default="false"/>
+    <arg name="use_camera" default="false"/>
+
+    <!--TODO: Document-->
+    <arg name="fcu_url" default="/dev/ttyTHS1:921600"/>
+    <arg name="gcs_url" default="udp://@192.168.0.29:14550" />   <!-- QGC running on Ubuntu -->
+    <arg name="tgt_system" default="1" />
+    <arg name="tgt_component" default="1" />
+
+    <arg name="odom_camera_name" default="camera" />   <!-- if we use something other than camera... it wont work -->
+
+    <!-- <param name="robot_description" command="cat $(find rotors_description)/urdf/tyrion.xacro" /> -->
+
+    <!-- TODO: This should be done by the map launch file!-->
+    <!-- <node pkg="tf" type="static_transform_publisher" name="static_tf_pub_1"
+    args="0 0 0 0 0 0 map odom 1000"/>  -->
+
+    <!--       Realsense T265 Camera (Odometry)        -->
+    <group if="$(arg use_camera)">
+
+        <!-- Launch static transform publishers TODO: Document -->
+
+        <!-- TODO: Document. I guess this is for the camras' placement (T265 and D435) but we need to know which are which -->
+        <node pkg="tf" type="static_transform_publisher" name="static_tf_pub_2"
+        args="0 0 0.205 0 0 0 odom camera_odom_frame 1000"/> 
+
+        <node pkg="tf" type="static_transform_publisher" name="static_tf_pub_4"
+            args="-0.15 0 0.05 0 0 0 camera_pose_frame base_link 1000"/> 
+
+
+        <!-- launch node to throttle images for logging TODO: Document why -->
+        <node name="drop_image1" pkg="topic_tools" type="drop" output="screen"
+            args="/$(arg odom_camera_name)/fisheye1/image_raw  9 10">
+        </node>
+        <node name="drop_image2" pkg="topic_tools" type="drop" output="screen"
+            args="/$(arg odom_camera_name)/fisheye2/image_raw  9 10">
+        </node>
+        
+        <!-- Throttle odometry messages to a fixed rate around 25Hz TODO: Document why  -->
+        <node name="odom_throttler" type="drop" pkg="topic_tools" 
+            args="/$(arg odom_camera_name)/odom/sample 7 8 /$(arg odom_camera_name)/odom/sample_throttled" >
+            <!-- JDS changing this to /camera won't do anything, backup $(arg odom_camera_name)) -->
+        </node>
+
+        <include file="$(find realsense2_camera)/launch/rs_t265.launch" >
+            <arg name="camera"                   value="$(arg odom_camera_name)"/> 
+            <!-- JDS changing this to camera won't do anything, backup $(arg odom_camera_name)) -->
+
+            <arg name="enable_fisheye1"          value="true"/>
+            <arg name="enable_fisheye2"          value="true"/>
+            <arg name="fisheye_fps"              value="30"/>
+            <arg name="gyro_fps"                 value="200"/>
+            <arg name="accel_fps"                value="62"/>
+            <arg name="enable_gyro"              value="false"/>
+            <arg name="enable_accel"             value="false"/>
+            <arg name="publish_odom_tf"          value="true"/>
+        </include>
+        
+        <env name="ROSCONSOLE_CONFIG_FILE" value="$(find drones_unizar)/cfg/custom_rosconsole.conf"/>
+
+        <arg name="input_topic" default="[/$(arg odom_camera_name)/odom/sample]"/>
+        <!-- JDS changing this to camera won't do anything, backup $(arg odom_camera_name)) -->
+
+        <!-- Bridge node to give position to PX4 from Realsense T265 -->
+        <node name="px4_realsense_bridge_node" pkg="px4_realsense_bridge" type="px4_realsense_bridge_node" output="screen" >
+            <rosparam param="input_topic" value="$(arg input_topic)"></rosparam>
+        </node>
+    </group>
+
+    <!--         Launch Optitrack        -->
+    <group if="$(arg use_optitrack)">
+        <include file="$(find optitrack_unizar)/launch/bringup_optitrack.launch" />
+    </group>
+
+    <!--          Launch MavROS          -->
+    <group ns="$(arg ns)">  <!-- before: ns  Changed: drone_name for PX4_CODE2 RQT GUI TODO: Document-->
+        <include file="$(find mavros)/launch/node.launch">
+            <arg name="pluginlists_yaml" value="$(find mavros)/launch/px4_pluginlists.yaml" />
+
+            <!-- Need to change the config file to get the tf topic and get local position in terms of local origin -->
+            <arg name="config_yaml" value="$(find mavros)/include/px4_config_cam.yaml" />
+
+            <arg name="fcu_url" value="$(arg fcu_url)" />
+            <arg name="gcs_url" value="$(arg gcs_url)" />
+            <arg name="tgt_system" value="$(arg tgt_system)" />
+            <arg name="tgt_component" value="$(arg tgt_component)" />
+        </include>
+    </group>
+
+    <!--    Launch Realsense D435i camera (RGB + Depth)   -->
+    <include file="$(find realsense2_camera)/launch/rs_d435_camera_with_model.launch"/>
+
+    <!--TODO: Document-->
+    <node pkg="nodelet" type="nodelet" name="nodelet_manager" args="manager" />
+    <node pkg="nodelet" type="nodelet" name="nodelet_frames"
+        args="load depth_image_proc/register nodelet_manager">
+    <remap from="rgb/camera_info" to="/rgbd_camera/color/camera_info"/>
+    <remap from="depth/camera_info" to="/rgbd_camera/depth/camera_info"/>
+    <remap from="depth/image_rect" to="/rgbd_camera/depth/image_rect_raw"/>
+    <remap from="depth_registered/camera_info" to="/rgbd_camera/depth_registered/camera_info"/>
+    <remap from="depth_registered/image_rect" to="/rgbd_camera/depth_registered/image_rect_raw"/>
+    </node>
+
+</launch>

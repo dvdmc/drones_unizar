@@ -1,6 +1,6 @@
 # Drones Unizar
 
-This repository is intended to deploy software into turtlebot's from the RoPeRT group at Universidad de Zaragoza. The repository includes installation scripts, configuration files and launchfiles for basic navigation, mapping and perception.
+This repository is intended to deploy software into turtlebot's from the RoPeRT group at Universidad de Zaragoza. The repository includes installation scripts, configuration files and launchfiles for basic navigation, mapping and perception. TODO
 
 ## Requirements
 

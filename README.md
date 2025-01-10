@@ -34,11 +34,19 @@ In order to grant the user permission over the serial port `ttyTHS1`of the Nvidi
 ```
 sudo cp 99-ttyths1-permissions.rules /etc/udev/rules.d/
 ```
+Since the rules are not applied at startup for some reason, we also create a systemd service to reload the rules:
+```
+sudo cp udev-apply-rules.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable udev-apply-rules.service
+sudo systemctl start udev-apply-rules.service
+```
+
 It might be necessary to restart the device to apply the previous. The ttyTHS1 is mapped inside the Docker container by using a volume (check `docker-compose.yml` file)
 
 """
 NOTE: This udev rules are for the Jetson Nanno configuration explained in the video.
-In order to list the serial ports, you can use:
+In order to list the serial ports to find the correct ones, you can use:
 ```
 ls /dev/tty*
 ```

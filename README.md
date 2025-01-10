@@ -1,41 +1,61 @@
 # Drones Unizar
 
-This repository is intended to deploy software into turtlebot's from the RoPeRT group at Universidad de Zaragoza. The repository includes installation scripts, configuration files and launchfiles for basic navigation, mapping and perception.
+This repository is intended to deploy software into drones' companion computers from the RoPeRT group at Universidad de Zaragoza. The repository includes different Docker images, configuration files and ROS packages for basic navigation, mapping and perception.
 
 ## Requirements
 
-This system was tested on __TODO!__ and ground station computers running __TODO!__. The installtion script will take care of ROS installation if it is not installed.
+This system was tested on a ROS2 Humble Docker container provided by Nvidia on a Jetson Nano with JetPack 4.6 JetPack 4.6.6 [L4T 32.7.6] and ground station computers running a ROS2 Humble Docker container. The Pixhawk firmware version is v1.14.
 
 ## Install
 
-To install the system first create a workspace of your choice on the robot or ground station computer:
-
-```
-mdkir -p ~/catkin_ws/src
-cd ~/catkin_ws/
-catkin init
-```
-
-Then, you should clone the repository in the 'src/' folder of the workspace:
+To install the system clone the repository in the companion computer:
 
 ```
 cd ~/catkin_ws/src/
 git clone https://github.com/dvdmc/drones_unizar.git
 ```
 
-Then, execute the 'install.sh' script and follow the installations steps on the terminal:
+
+### Configure Pixhawk
+
+The main way of configuring the Pixhawk is through QGroundControl. QGroundControl should be installed in the ground station and you can connect to a new Pixhawk by USB directly or by a USB telemetry radio.
+
+The basic configurations for a new Pixhawk are:
+- Flash the PX4 following (last tested version is 1.15.2): https://docs.px4.io/main/en/config/firmware.html
+- __TODO__ (JBes, JDese):
+
+### Connect to a companion computer
+
+This example is based on a Jetson Nano. The Jetson serial ports (TX,RX,Ground) are connected to the TELEM2 Pixhawk port ([reference](https://www.youtube.com/watch?v=nIuoCYauW3s) NOTE: Double check the port layout numbers TX=8, RX=10, GND=6 or 9). 
+
+### Configure udev rules
+
+In order to grant the user permission over the serial port `ttyTHS1`of the Nvidia Jetson Nano, the udev `99-ttyths1-permissions.rule` rules have to be copied as:
+```
+sudo cp 99-ttyths1-permissions.rules /etc/udev/rules.d/
+```
+It might be necessary to restart the device to apply the previous. The ttyTHS1 is mapped inside the Docker container by using a volume (check `docker-compose.yml` file)
+
+"""
+NOTE: This udev rules are for the Jetson Nanno configuration explained in the video.
+In order to list the serial ports, you can use:
+```
+ls /dev/tty*
+```
+"""
+
+### Starting the Docker
+
+You can simply run the following to start the Docker **on Jetson Nano** (TODO: Create others for Orin):
 
 ```
-. install.sh
+. ./start_pixhawk_companion.sh
 ```
-
-This script will install different tools (including ROS if required) and should work from a fresh Ubuntu __TODO!__ installation.
-You can check this file to change the installation process.
-If you want to reconfigure some settings without reinstalling anything you can check the 'setup.sh' file.
+Recommended: check the script to see what it does.
 
 ### Dependencies
 
-If you want to use Optitrack within Unizar, you should also prepare the `optitrack_unizar` package.
+If you want to use Optitrack within Unizar, you should also prepare the `ground_station_unizar` package in the ground station computer.
 
 ## Usage
 
@@ -48,11 +68,7 @@ Before running any application __TODO!__
 
 ### Reactive navigation
 
-__TODO!__ You can start (__TODO!__: Actual procedure) the robot and use its local navigation and odometry modules to perform reactive navigation with:
-
-```
-roslaunch turtlebot_unizar_bringup single_turtlebot_no_map.launch
-```
+__TODO!__ You can start (__TODO!__: Actual procedure)
 
 ### Create a map
 
@@ -85,11 +101,13 @@ roslaunch turtlebot_unizar_bringup single_turtlebot_amcl.launch map_file:={PATH_
 Scrip to open the serial por for connection with the PX4 controller.
 __TODO!__: Is it needed in the launch script? How does it really work? Can be added to the entrypoint?
 
-### search_usb.sh
+## Sources
 
-Simple script that displays the serial number of the USB devices connected to the computer.
-Useful for identifying ports in ssh connections.
-
+- ROS2 Humble Desktop Docker image for Jetson Nano (old): https://github.com/dusty-nv/jetson-containers/tree/master/packages/ros
+- JetPack 4.6 JetPack 4.6.6 [L4T 32.7.6] for Jetson Nano: https://developer.nvidia.com/jetpack-sdk-466
+- Tutorial for setting up Pixhawk with ROS2: https://docs.px4.io/main/en/ros2/user_guide.html
+- Tutorial for setting up mavros in ROS2 Humble: https://github.com/mavlink/mavros/blob/ros2/mavros/README.md#installation 
+- Possible reference for DDS config: https://discuss.px4.io/t/uxrce-dds-bridge-multicast-udp-addresses-and-ports/32218/4
 ## Structure
 
 __TODO!__
@@ -101,8 +119,6 @@ If you want to contribute to the repository, you can open an issue with your pro
 ## Acknowledgements
 
 Main contributors to this repository are:
-- Juan D. (corresponding)
-- Jorge B. (corresponding)
-- Pablo P.
-- Caspar
 - David M. (corresponding)
+- Jorge B.
+- Juan D.

@@ -1,0 +1,2 @@
+# Add permissions for the user to the serial port of the Jetson Nano ttyTHS1
+KERNEL=="ttyTHS1", MODE="0666"

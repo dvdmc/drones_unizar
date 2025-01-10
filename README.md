@@ -36,10 +36,9 @@ sudo cp 99-ttyths1-permissions.rules /etc/udev/rules.d/
 ```
 Since the rules are not applied at startup for some reason, we also create a systemd service to reload the rules:
 ```
-sudo cp udev-apply-rules.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable udev-apply-rules.service
-sudo systemctl start udev-apply-rules.service
+sudo cp fix-ttyths1.sh /etc/init.d/
+sudo chmod +x /etc/init.d/fix-ttyths1.sh
+sudo update-rc.d fix-ttyths1.sh defaults
 ```
 
 It might be necessary to restart the device to apply the previous. The ttyTHS1 is mapped inside the Docker container by using a volume (check `docker-compose.yml` file)

@@ -1,0 +1,1 @@
+ros2 launch mavros px4.launch fcu_url:='/dev/ttyTHS1:921600' gcs_url:='udp://@192.168.0.29:14550'

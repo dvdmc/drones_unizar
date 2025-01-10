@@ -6,6 +6,13 @@ This repository is intended to deploy software into drones' companion computers 
 
 This system was tested on a ROS2 Humble Docker container provided by Nvidia on a Jetson Nano with JetPack 4.6 JetPack 4.6.6 [L4T 32.7.6] and ground station computers running a ROS2 Humble Docker container. The Pixhawk firmware version is v1.14.
 
+Install Python3 pip to install docker-compose [ref](https://dev.to/ductapedev/install-docker-compose-on-nvidia-jetson-nano-2oe):
+```
+sudo apt-get install -y python3-pip libssl-dev python-openssl libffi-dev rustc cargo
+python3 -m pip install --upgrade pip==21.1.3 setuptools==56.2.0
+sudo -H python3 -m pip install docker-compose==1.29.2
+```
+
 ## Install
 
 To install the system clone the repository in the companion computer:
@@ -28,7 +35,7 @@ The basic configurations for a new Pixhawk are:
 
 This example is based on a Jetson Nano. The Jetson serial ports (TX,RX,Ground) are connected to the TELEM2 Pixhawk port ([reference](https://www.youtube.com/watch?v=nIuoCYauW3s) NOTE: Double check the port layout numbers TX=8, RX=10, GND=6 or 9). 
 
-### Configure udev rules
+### Configure udev rules (still not working)
 
 In order to grant the user permission over the serial port `ttyTHS1`of the Nvidia Jetson Nano, the udev `99-ttyths1-permissions.rule` rules have to be copied as:
 ```

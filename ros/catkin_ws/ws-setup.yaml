@@ -1,0 +1,23 @@
+# ./.tmuxinator.yml
+
+name: ws-setup
+root: ./
+startup_window: main
+
+windows:
+  - main:
+      layout: main-vertical
+      # Synchronize all panes of this window, can be enabled before or after the pane commands run.
+      # 'before' represents legacy functionality and will be deprecated in a future release, in favour of 'after'
+      # synchronize: after
+      panes:
+        - source devel/setup.bash
+        - source devel/setup.bash
+
+  - take-off:
+    - source devel/setup.bash
+    - echo "roslaunch drone_connection.launch"
+
+  - rviz:
+    - source devel/setup.bash
+    - rosrun rviz rviz -d src/nav_stack/cnfg/cnfg_real_drone_flying_ocho.rviz

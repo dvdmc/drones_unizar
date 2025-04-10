@@ -4,10 +4,15 @@ This repository is intended to deploy software into drones' companion computers 
 
 ## Requirements
 
-This system was tested on a ROS2 Humble Docker container provided by Nvidia on a Jetson Nano with JetPack 4.6 JetPack 4.6.6 [L4T 32.7.6] and ground station computers running a ROS2 Humble Docker container. The Pixhawk firmware version is v1.14.
+This system was tested on a ROS2 Humble Docker container provided by Nvidia on a Jetson Nano with JetPack 4.6 JetPack 4.6.6 [L4T 32.7.6] and ground station computers running a ROS2 Humble Docker container. The Pixhawk firmware version is v1.14. Remember to:
+
+```bash
+sudo apt-get update
+sudo apt-get upgrade
+```
 
 Install Python3 pip to install docker-compose [ref](https://dev.to/ductapedev/install-docker-compose-on-nvidia-jetson-nano-2oe):
-```
+```bash
 sudo apt-get install -y python3-pip libssl-dev python-openssl libffi-dev rustc cargo
 python3 -m pip install --upgrade pip==21.1.3 setuptools==56.2.0
 sudo -H python3 -m pip install docker-compose==1.29.2

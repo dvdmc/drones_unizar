@@ -1,0 +1,19 @@
+# ./.tmuxinator.yml
+
+name: ws-setup
+root: ./
+startup_window: main
+
+windows:
+  - main:
+      layout: main-vertical
+      # Synchronize all panes of this window, can be enabled before or after the pane commands run.
+      # 'before' represents legacy functionality and will be deprecated in a future release, in favour of 'after'
+      # synchronize: after
+      panes:
+        - source devel/setup.bash && export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/root/PX4-Autopilot:/root/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic && source /root/PX4-Autopilot/Tools/simulation/gazebo-classic/setup_gazebo.bash /root/PX4-Autopilot /root/PX4-Autopilot/build/px4_sitl_default
+        - source devel/setup.bash && export ROS_PACKAGE_PATH=$ROS_PACKAGE_PATH:/root/PX4-Autopilot:/root/PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic && source /root/PX4-Autopilot/Tools/simulation/gazebo-classic/setup_gazebo.bash /root/PX4-Autopilot /root/PX4-Autopilot/build/px4_sitl_default
+
+  # - rviz:
+  #   - source devel/setup.bash
+  #   - rosrun rviz rviz -d src/nav_stack/cnfg/cnfg_real_drone_flying_ocho.rviz
